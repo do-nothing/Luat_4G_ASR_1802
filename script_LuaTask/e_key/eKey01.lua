@@ -35,7 +35,7 @@ local publishCnt = 1
 ]]
 local function publishTestCb(result,para)
     log.info("testALiYun.publishTestCb",result,para)
-    sys.timerStart(publishTest,20000)
+    --sys.timerStart(publishTest,20000)
     publishCnt = publishCnt+1
 end
 
@@ -43,7 +43,7 @@ end
 function publishTest()
     if sConnected then
         --注意：在此处自己去控制payload的内容编码，aLiYun库中不会对payload的内容做任何编码转换
-        aLiYun.publish("/"..PRODUCT_KEY.."/"..getDeviceName().."/update","qos1data",1,publishTestCb,"publishTest_"..publishCnt)
+        aLiYun.publish("/"..PRODUCT_KEY.."/"..getDeviceName().."/update","{\"target\":\"demo1\",\"command\":\"ok\"}",1,publishTestCb,"publishTest_"..publishCnt)
     end
 end
 
@@ -71,8 +71,7 @@ local function connectCbFnc(result)
         aLiYun.subscribe({["/"..PRODUCT_KEY.."/"..getDeviceName().."/get"]=0, ["/"..PRODUCT_KEY.."/"..getDeviceName().."/get"]=1})
         --注册数据接收的处理函数
         aLiYun.on("receive",rcvCbFnc)
-        --PUBLISH消息测试
-        publishTest()
+
         setGpio65Fnc(1)
     end
 end
@@ -110,6 +109,7 @@ function gpio54IntFnc(msg)
         setGpio53Fnc(0)
     else
         setGpio65Fnc(1)
+        publishTest()
     end
 end
 
